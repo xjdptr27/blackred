@@ -2281,3 +2281,94 @@ select:focus, input:focus {
         max-height: 22svh !important;
     }
 }
+
+/* ===== MOBILE HERO RESTORE FROM FFFF_ADAPTIVE ===== */
+@media (max-width: 1024px) {
+    .hero-grid {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+    }
+
+    .hero-image-wrapper {
+        order: -1 !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        border-radius: 18px !important;
+    }
+
+    .hero-image {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 44svh !important;
+        max-height: 52svh !important;
+        object-fit: cover !important;
+        object-position: center !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        align-items: center !important;
+        padding-top: 86px !important;
+        text-align: left !important;
+    }
+
+    .hero-content {
+        order: 0 !important;
+        width: 100% !important;
+        text-align: left !important;
+    }
+
+    .hero h1 {
+        font-size: clamp(2rem, 11vw, 3rem) !important;
+        line-height: 1 !important;
+    }
+
+    .hero-description {
+        max-width: none !important;
+        font-size: 0.98rem !important;
+    }
+
+    .hero-image-wrapper {
+        order: -1 !important;
+        margin-top: 0 !important;
+    }
+
+    .hero-image {
+        min-height: auto !important;
+        max-height: 34svh !important;
+        aspect-ratio: 16 / 10 !important;
+        object-fit: cover !important;
+    }
+
+    .hero-stats {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+    }
+
+    .hero-buttons {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .hero-buttons .btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-stats {
+        gap: 8px !important;
+    }
+
+    .stat-number {
+        font-size: 1.35rem !important;
+    }
+
+    .stat-label {
+        font-size: 0.62rem !important;
+        letter-spacing: 0.4px !important;
+    }
+}
