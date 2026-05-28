@@ -2186,3 +2186,98 @@ select:focus, input:focus {
         min-height: 245px;
     }
 }
+
+/* ===== HOTFIX MOBILE HERO + ADDRESS UPDATE BUILD ===== */
+@media (max-width: 768px) {
+    .hero {
+        min-height: 100svh;
+        padding-top: 86px;
+        padding-bottom: 44px;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .hero-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 22px !important;
+        align-items: center;
+    }
+
+    .hero-content {
+        order: 1;
+        width: 100%;
+        text-align: left;
+    }
+
+    .hero h1 {
+        max-width: 100%;
+        margin-bottom: 18px;
+        font-size: clamp(2.25rem, 12vw, 3.45rem);
+        line-height: 0.98;
+    }
+
+    .hero-description {
+        max-width: 100%;
+        margin-bottom: 22px;
+        font-size: 1rem;
+        line-height: 1.55;
+    }
+
+    .hero-buttons {
+        width: 100%;
+        margin-bottom: 24px;
+    }
+
+    .hero-image-wrapper {
+        order: 2;
+        width: 100%;
+        min-height: 0;
+        margin-top: 2px;
+        justify-content: center;
+        overflow: visible;
+        border-radius: 0;
+    }
+
+    .hero-image {
+        width: min(100%, 420px) !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: 28svh !important;
+        aspect-ratio: auto !important;
+        object-fit: contain !important;
+        object-position: center !important;
+        display: block;
+    }
+}
+
+@media (max-width: 560px) {
+    .hero {
+        padding-top: 82px;
+        padding-bottom: 40px;
+    }
+
+    .hero-grid {
+        gap: 20px !important;
+    }
+
+    .hero h1 {
+        font-size: clamp(2.15rem, 12.8vw, 3.2rem);
+    }
+
+    .hero-image {
+        width: min(100%, 360px) !important;
+        max-height: 24svh !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .hero h1 {
+        font-size: clamp(2rem, 12vw, 2.7rem);
+    }
+
+    .hero-image {
+        max-height: 22svh !important;
+    }
+}
