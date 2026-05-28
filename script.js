@@ -242,6 +242,94 @@ document.addEventListener('DOMContentLoaded', function() {
         syncPortfolioLayout();
     }
 
+
+    // ========================
+    // МОБИЛЬНЫЙ СЛАЙДЕР БЛОКА «ПРОЦЕСС РАБОТЫ»
+    // ========================
+    const studioGrid = document.getElementById('studioGrid');
+    const studioPrevBtn = document.getElementById('studioPrev');
+    const studioNextBtn = document.getElementById('studioNext');
+    const studioDotsContainer = document.getElementById('studioDots');
+
+    if (studioGrid && studioPrevBtn && studioNextBtn) {
+        let studioCurrentPage = 0;
+        let studioTotalPages = 1;
+        let studioResizeTimer = null;
+        const studioItems = Array.from(studioGrid.querySelectorAll('.studio-item'));
+
+        function isStudioSliderEnabled() {
+            return window.innerWidth <= 768;
+        }
+
+        function renderStudioDots() {
+            if (!studioDotsContainer) return;
+
+            studioDotsContainer.innerHTML = '';
+            if (!isStudioSliderEnabled()) return;
+
+            for (let i = 0; i < studioTotalPages; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('studio-dot');
+                if (i === studioCurrentPage) dot.classList.add('active');
+                dot.addEventListener('click', () => goToStudioPage(i));
+                studioDotsContainer.appendChild(dot);
+            }
+        }
+
+        function updateStudioDots() {
+            const dots = studioDotsContainer?.querySelectorAll('.studio-dot');
+            dots?.forEach((dot, index) => dot.classList.toggle('active', index === studioCurrentPage));
+        }
+
+        function updateStudioButtons() {
+            const enabled = isStudioSliderEnabled();
+            studioPrevBtn.style.display = enabled ? 'flex' : 'none';
+            studioNextBtn.style.display = enabled ? 'flex' : 'none';
+            studioPrevBtn.disabled = studioCurrentPage === 0;
+            studioNextBtn.disabled = studioCurrentPage >= studioTotalPages - 1;
+        }
+
+        function goToStudioPage(page) {
+            if (!isStudioSliderEnabled()) {
+                studioCurrentPage = 0;
+                studioGrid.style.transform = 'translateX(0)';
+                updateStudioButtons();
+                updateStudioDots();
+                return;
+            }
+
+            studioCurrentPage = Math.max(0, Math.min(page, studioTotalPages - 1));
+            const targetItem = studioItems[studioCurrentPage];
+            const offset = targetItem ? targetItem.offsetLeft : 0;
+            studioGrid.style.transform = 'translateX(-' + offset + 'px)';
+            updateStudioDots();
+            updateStudioButtons();
+        }
+
+        function syncStudioLayout() {
+            if (isStudioSliderEnabled()) {
+                studioTotalPages = Math.max(1, studioItems.length);
+                studioCurrentPage = Math.min(studioCurrentPage, studioTotalPages - 1);
+            } else {
+                studioTotalPages = 1;
+                studioCurrentPage = 0;
+            }
+
+            renderStudioDots();
+            goToStudioPage(studioCurrentPage);
+        }
+
+        studioPrevBtn.addEventListener('click', () => goToStudioPage(studioCurrentPage - 1));
+        studioNextBtn.addEventListener('click', () => goToStudioPage(studioCurrentPage + 1));
+
+        window.addEventListener('resize', () => {
+            clearTimeout(studioResizeTimer);
+            studioResizeTimer = setTimeout(syncStudioLayout, 120);
+        });
+
+        syncStudioLayout();
+    }
+
     // ========================
     // КОНСТРУКТОР
     // ========================

@@ -1864,3 +1864,325 @@ select:focus, input:focus {
         padding: 14px 16px;
     }
 }
+
+/* ===== ФИНАЛЬНАЯ АДАПТАЦИЯ И ЕДИНЫЕ ОТСТУПЫ ===== */
+:root {
+    --section-padding-top: clamp(88px, 9vh, 118px);
+    --section-padding-bottom: clamp(58px, 7vh, 88px);
+    --section-gap: clamp(18px, 2vw, 28px);
+}
+
+.fullscreen-section {
+    padding-top: var(--section-padding-top);
+    padding-bottom: var(--section-padding-bottom);
+}
+
+.section-subtitle {
+    margin-bottom: clamp(24px, 3vw, 42px);
+}
+
+.grid-3,
+.grid-4,
+.service-showcase,
+.studio-grid,
+.contact-wrapper,
+.constructor-grid {
+    gap: var(--section-gap);
+}
+
+/* Блок «Процесс работы»: на десктопе обычная сетка, на телефоне слайдер */
+.studio-wrapper {
+    width: 100%;
+    position: relative;
+}
+
+.studio-grid-wrapper {
+    width: 100%;
+    overflow: visible;
+}
+
+.studio-arrow,
+.studio-dots {
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    :root {
+        --container-max: 1180px;
+        --page-gutter: clamp(18px, 3vw, 34px);
+    }
+
+    .hero-grid {
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --section-padding-top: 88px;
+        --section-padding-bottom: 64px;
+        --section-gap: 22px;
+    }
+
+    .fullscreen-section {
+        min-height: auto;
+        align-items: flex-start;
+    }
+
+    .hero {
+        min-height: 100svh;
+        align-items: center;
+    }
+
+    .studio-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .service-item {
+        aspect-ratio: 4 / 5;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --section-padding-top: 82px;
+        --section-padding-bottom: 52px;
+        --section-gap: 18px;
+        --page-gutter: 18px;
+    }
+
+    .fullscreen-section {
+        min-height: auto;
+        padding-top: var(--section-padding-top);
+        padding-bottom: var(--section-padding-bottom);
+    }
+
+    .hero {
+        min-height: 100svh;
+        padding-top: 84px;
+        padding-bottom: 46px;
+    }
+
+    .container {
+        padding-left: var(--page-gutter);
+        padding-right: var(--page-gutter);
+    }
+
+    .section-subtitle {
+        margin-bottom: 22px;
+    }
+
+    .feature-card,
+    .service-item,
+    .review-card,
+    .faq-item,
+    .constructor-panel,
+    .contact-wrapper {
+        border-radius: 18px;
+    }
+
+    .service-showcase,
+    .grid-3,
+    .grid-4 {
+        gap: 18px;
+    }
+
+    .service-item {
+        aspect-ratio: 16 / 11;
+        min-height: 320px;
+    }
+
+    .portfolio-caption,
+    .studio-caption {
+        opacity: 1;
+        transform: none;
+    }
+
+    .portfolio-caption {
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        padding: 10px 12px;
+    }
+
+    .portfolio-wrapper,
+    .studio-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .studio-grid-wrapper {
+        overflow: hidden;
+        flex: 1;
+        border-radius: 14px;
+    }
+
+    .studio-grid {
+        display: flex;
+        grid-template-columns: none;
+        gap: 0;
+        transition: transform 0.45s ease;
+    }
+
+    .studio-item {
+        flex: 0 0 100%;
+        min-width: 100%;
+        aspect-ratio: 1 / 1;
+    }
+
+    .studio-caption {
+        bottom: 14px;
+        left: 14px;
+        right: 14px;
+        padding: 12px 14px;
+    }
+
+    .studio-caption h4 {
+        font-size: 0.95rem;
+    }
+
+    .studio-caption p {
+        font-size: 0.82rem;
+    }
+
+    .studio-arrow {
+        width: 40px;
+        height: 40px;
+        background: rgba(220, 38, 38, 0.2);
+        border: 1px solid rgba(220, 38, 38, 0.4);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+        z-index: 5;
+        transition: all 0.3s ease;
+    }
+
+    .studio-arrow:hover,
+    .studio-arrow:focus-visible {
+        background: #dc2626;
+        border-color: #dc2626;
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.45);
+        outline: none;
+    }
+
+    .studio-arrow:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        box-shadow: none;
+        background: rgba(220, 38, 38, 0.16);
+    }
+
+    .studio-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 18px;
+    }
+
+    .studio-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .studio-dot.active {
+        background: #dc2626;
+        transform: scale(1.3);
+    }
+
+    .constructor-panel,
+    .contact-wrapper {
+        padding: 22px 18px;
+    }
+
+    .footer {
+        padding: 40px 0 24px;
+    }
+}
+
+@media (max-width: 560px) {
+    :root {
+        --page-gutter: 14px;
+        --section-padding-top: 78px;
+        --section-padding-bottom: 46px;
+        --section-gap: 16px;
+    }
+
+    h2 {
+        font-size: clamp(1.65rem, 8.5vw, 2.1rem);
+    }
+
+    .section-subtitle {
+        font-size: 0.94rem;
+        margin-bottom: 18px;
+    }
+
+    .hero-grid {
+        gap: 20px;
+    }
+
+    .hero-image {
+        max-height: 30svh;
+        aspect-ratio: 16 / 10;
+    }
+
+    .hero h1 {
+        font-size: clamp(1.9rem, 10vw, 2.6rem);
+    }
+
+    .service-item {
+        min-height: 280px;
+    }
+
+    .portfolio-wrapper,
+    .studio-wrapper {
+        gap: 8px;
+    }
+
+    .portfolio-arrow,
+    .studio-arrow {
+        width: 36px;
+        height: 36px;
+    }
+
+    .studio-caption,
+    .portfolio-caption {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        padding: 10px 12px;
+    }
+
+    .contact-wrapper,
+    .constructor-panel {
+        padding: 20px 16px;
+    }
+}
+
+@media (max-width: 380px) {
+    :root {
+        --page-gutter: 12px;
+    }
+
+    .hero-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .portfolio-arrow,
+    .studio-arrow {
+        width: 34px;
+        height: 34px;
+    }
+
+    .service-item {
+        min-height: 245px;
+    }
+}

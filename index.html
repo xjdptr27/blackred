@@ -194,12 +194,23 @@
         <div class="container">
             <h2>Процесс работы</h2>
             <p class="section-subtitle">Этапы подготовки и оклейки автомобиля</p>
-            <div class="studio-grid">
-                <div class="studio-item"><img src="images/studio-1.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Полировка кузова</h4><p>Удаление царапин и голограмм</p></div></div>
-                <div class="studio-item"><img src="images/studio-2.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Подготовка поверхности</h4><p>Обезжиривание и очистка</p></div></div>
-                <div class="studio-item"><img src="images/studio-3.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Оклейка плёнкой</h4><p>Точная подгонка материала</p></div></div>
-                <div class="studio-item"><img src="images/studio-4.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Финальный осмотр</h4><p>Контроль качества</p></div></div>
+            <div class="studio-wrapper">
+                <button class="studio-arrow studio-arrow-left" id="studioPrev" type="button" aria-label="Предыдущий этап">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <div class="studio-grid-wrapper">
+                    <div class="studio-grid" id="studioGrid">
+                        <div class="studio-item"><img src="images/studio-1.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Полировка кузова</h4><p>Удаление царапин и голограмм</p></div></div>
+                        <div class="studio-item"><img src="images/studio-2.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Подготовка поверхности</h4><p>Обезжиривание и очистка</p></div></div>
+                        <div class="studio-item"><img src="images/studio-3.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Оклейка плёнкой</h4><p>Точная подгонка материала</p></div></div>
+                        <div class="studio-item"><img src="images/studio-4.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Финальный осмотр</h4><p>Контроль качества</p></div></div>
+                    </div>
+                </div>
+                <button class="studio-arrow studio-arrow-right" id="studioNext" type="button" aria-label="Следующий этап">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
             </div>
+            <div class="studio-dots" id="studioDots"></div>
         </div>
     </section>
 
