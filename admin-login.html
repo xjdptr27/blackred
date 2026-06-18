@@ -67,7 +67,7 @@
             padding: 58px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             min-height: 640px;
             border-right: 1px solid rgba(255,255,255,0.08);
         }
@@ -109,7 +109,7 @@
 
         .brand-title {
             position: relative;
-            margin-top: 72px;
+            margin-top: 48px;
         }
 
         .brand-title h1 {
@@ -130,32 +130,6 @@
             color: rgba(255,255,255,0.68);
             font-size: 17px;
             line-height: 1.65;
-        }
-
-        .info-grid {
-            position: relative;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-            margin-top: 42px;
-        }
-
-        .info-card {
-            padding: 18px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.045);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .info-card strong {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 18px;
-        }
-
-        .info-card span {
-            color: var(--muted);
-            font-size: 13px;
         }
 
         .form-side {
@@ -249,17 +223,6 @@
             line-height: 1.4;
         }
 
-        .security-note {
-            margin-top: 34px;
-            padding: 18px;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.035);
-            color: rgba(255,255,255,0.56);
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
         @media (max-width: 900px) {
             body {
                 overflow: auto;
@@ -282,15 +245,11 @@
             }
 
             .brand-title {
-                margin-top: 42px;
+                margin-top: 32px;
             }
         }
 
         @media (max-width: 560px) {
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
             .brand-side,
             .form-side {
                 padding: 24px;
@@ -313,16 +272,6 @@
                 </div>
             </div>
 
-            <div class="info-grid">
-                <div class="info-card">
-                    <strong>Orders</strong>
-                    <span>заявки клиентов</span>
-                </div>
-                <div class="info-card">
-                    <strong>Control</strong>
-                    <span>статусы, цена, заметки</span>
-                </div>
-            </div>
         </section>
 
         <section class="form-side">
@@ -342,10 +291,6 @@
 
                 <button class="login-btn" id="loginBtn" type="submit">Войти</button>
                 <div class="message" id="message"></div>
-
-                <div class="security-note">
-                    Пароль хранится только на Render в переменной <b>ADMIN_PASSWORD</b>. В GitHub он не попадает.
-                </div>
             </form>
         </section>
     </main>
