@@ -4,31 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLACKRED | Админка</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #111; color: #fff; padding: 40px; }
-        h1 { color: #dc2626; margin-bottom: 30px; font-size: 1.5rem; }
-        h1 span { color: #fff; font-size: 1rem; margin-left: 10px; }
+        body { font-family: Arial, sans-serif; background: #111; color: #fff; padding: 32px; }
+        .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        h1 { color: #dc2626; font-size: 1.6rem; }
+        h1 span { color: #fff; font-size: 1rem; margin-left: 10px; font-weight: 400; }
+        a { color: #fff; text-decoration: none; }
+        .top-actions { display: flex; gap: 10px; align-items: center; }
         .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .filter-btn { padding: 8px 20px; border: 1px solid #333; border-radius: 20px; background: transparent; color: #999; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
-        .filter-btn:hover, .filter-btn.active { background: #dc2626; color: #fff; border-color: #dc2626; }
-        table { width: 100%; border-collapse: collapse; background: #1a1a1a; border-radius: 12px; overflow: hidden; }
-        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #2a2a2a; font-size: 0.9rem; }
-        th { background: #dc2626; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .filter-btn, .refresh-btn { padding: 8px 18px; border: 1px solid #333; border-radius: 20px; background: transparent; color: #bbb; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+        .filter-btn:hover, .filter-btn.active, .refresh-btn:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+        .status-line { margin-bottom: 18px; color: #999; min-height: 20px; }
+        .table-wrap { overflow-x: auto; border-radius: 12px; background: #1a1a1a; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #2a2a2a; font-size: 0.9rem; vertical-align: top; }
+        th { background: #dc2626; color: #fff; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; }
         tr:hover { background: #222; }
-        input, select { background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; width: 100%; font-family: 'Inter', sans-serif; }
-        input[type="date"], input[type="time"] { width: 130px; }
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; margin: 2px; }
+        input, select { background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; width: 100%; }
+        input[type="date"], input[type="time"] { min-width: 125px; }
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; margin: 2px; white-space: nowrap; }
         .btn-save { background: #16a34a; color: #fff; }
         .btn-delete { background: #333; color: #fff; }
         .btn-delete:hover { background: #dc2626; }
         .empty { text-align: center; padding: 40px; color: #666; }
+        .error { color: #ff6b6b; }
+        .ok { color: #4ade80; }
     </style>
 </head>
 <body>
-    <h1>BLACKRED <span>| Управление заявками</span></h1>
-    
+    <div class="top">
+        <h1>BLACKRED <span>| Управление заявками</span></h1>
+        <div class="top-actions">
+            <a href="/">На сайт</a>
+            <button class="refresh-btn" id="refreshBtn">Обновить</button>
+        </div>
+    </div>
+
     <div class="filters">
         <button class="filter-btn active" data-filter="all">Все</button>
         <button class="filter-btn" data-filter="Новая">Новые</button>
@@ -37,36 +49,40 @@
         <button class="filter-btn" data-filter="Отменена">Отменённые</button>
     </div>
 
-    <table id="ordersTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Клиент</th>
-                <th>Авто</th>
-                <th>Телефон</th>
-                <th>Email</th>
-                <th>Услуга</th>
-                <th>Дата</th>
-                <th>Время</th>
-                <th>Статус</th>
-                <th>Цена</th>
-                <th>Заметки</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="status-line" id="statusLine">Загрузка заявок...</div>
+
+    <div class="table-wrap">
+        <table id="ordersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Создана</th>
+                    <th>Клиент</th>
+                    <th>Авто</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Услуга</th>
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>Статус</th>
+                    <th>Цена</th>
+                    <th>Заметки</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
     <script>
         (function() {
-            const SUPABASE_URL = 'https://aoayarnbgaxcbmawyxhv.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_mkAZARtxqCq1j5_UdE-OEA_zm1TAe3y';
-            const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
             let allOrders = [];
             let currentFilter = 'all';
 
-            // Фильтры
+            const statusLine = document.getElementById('statusLine');
+            const tbody = document.querySelector('#ordersTable tbody');
+            const refreshBtn = document.getElementById('refreshBtn');
+
             document.querySelectorAll('.filter-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     currentFilter = this.dataset.filter;
@@ -76,25 +92,52 @@
                 });
             });
 
-            async function loadOrders() {
-                const { data, error } = await client
-                    .from('orders')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+            if (refreshBtn) refreshBtn.addEventListener('click', loadOrders);
 
-                if (error) { console.error(error); return; }
-                allOrders = data || [];
-                renderOrders();
+            async function api(url, options) {
+                const response = await fetch(url, {
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    ...(options || {})
+                });
+
+                let result = null;
+                try {
+                    result = await response.json();
+                } catch (error) {}
+
+                if (!response.ok || result?.ok === false) {
+                    throw new Error(result?.error || 'Ошибка запроса');
+                }
+
+                return result;
+            }
+
+            async function loadOrders() {
+                try {
+                    statusLine.className = 'status-line';
+                    statusLine.textContent = 'Загрузка заявок...';
+                    const result = await api('/api/orders');
+                    allOrders = result.orders || [];
+                    statusLine.className = 'status-line ok';
+                    statusLine.textContent = 'Загружено заявок: ' + allOrders.length;
+                    renderOrders();
+                } catch (error) {
+                    console.error(error);
+                    allOrders = [];
+                    tbody.innerHTML = '<tr><td colspan="13" class="empty error">' + esc(error.message) + '</td></tr>';
+                    statusLine.className = 'status-line error';
+                    statusLine.textContent = 'Ошибка загрузки заявок';
+                }
             }
 
             function renderOrders() {
-                const tbody = document.querySelector('#ordersTable tbody');
-                const filtered = currentFilter === 'all' 
-                    ? allOrders 
+                const filtered = currentFilter === 'all'
+                    ? allOrders
                     : allOrders.filter(function(o) { return o.status === currentFilter; });
-                
+
                 if (filtered.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="12" class="empty">Нет заявок</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="13" class="empty">Нет заявок</td></tr>';
                     return;
                 }
 
@@ -102,6 +145,7 @@
                     return `
                     <tr>
                         <td>#${order.id}</td>
+                        <td>${formatDate(order.created_at)}</td>
                         <td><input value="${esc(order.client_name)}" id="name-${order.id}"></td>
                         <td><input value="${esc(order.car_model)}" id="car-${order.id}"></td>
                         <td><input value="${esc(order.phone || '')}" id="phone-${order.id}"></td>
@@ -126,77 +170,80 @@
                     </tr>`;
                 }).join('');
 
-                // Вешаем обработчики
                 tbody.querySelectorAll('.btn-save').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        saveOrder(this.dataset.id);
-                    });
+                    btn.addEventListener('click', function() { saveOrder(this.dataset.id); });
                 });
 
                 tbody.querySelectorAll('.btn-delete').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        deleteOrder(this.dataset.id);
-                    });
+                    btn.addEventListener('click', function() { deleteOrder(this.dataset.id); });
                 });
             }
 
             function esc(text) {
-                if (!text) return '';
-                return text.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                if (text === null || text === undefined) return '';
+                return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             }
 
-                        async function saveOrder(id) {
+            function formatDate(value) {
+                if (!value) return '';
+                const date = new Date(value);
+                if (Number.isNaN(date.getTime())) return '';
+                return date.toLocaleString('ru-RU');
+            }
+
+            async function saveOrder(id) {
                 const phone = document.getElementById('phone-' + id).value;
                 const email = document.getElementById('email-' + id).value;
                 const price = document.getElementById('price-' + id).value;
-                
-                // Проверка телефона (должно быть 11 цифр)
                 const phoneDigits = phone.replace(/\D/g, '');
+
                 if (phoneDigits.length !== 11 && phoneDigits.length !== 0) {
                     alert('Телефон должен содержать 11 цифр');
                     return;
                 }
-                
-                // Проверка email
+
                 if (email && !/^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email)) {
                     alert('Введите корректный email');
                     return;
                 }
-                
-                // Проверка цены (только цифры)
+
                 if (price && !/^\d*$/.test(price)) {
                     alert('Цена должна содержать только цифры');
                     return;
                 }
-                
-                const { error } = await client
-                    .from('orders')
-                    .update({
-                        client_name: document.getElementById('name-' + id).value,
-                        car_model: document.getElementById('car-' + id).value,
-                        phone: phone,
-                        email: email,
-                        service: document.getElementById('service-' + id).value,
-                        appointment_date: document.getElementById('date-' + id).value || null,
-                        appointment_time: document.getElementById('time-' + id).value || null,
-                        status: document.getElementById('status-' + id).value,
-                        price: price,
-                        notes: document.getElementById('notes-' + id).value
-                    })
-                    .eq('id', id);
 
-                if (!error) {
+                try {
+                    await api('/api/orders/' + encodeURIComponent(id), {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            client_name: document.getElementById('name-' + id).value,
+                            car_model: document.getElementById('car-' + id).value,
+                            phone,
+                            email,
+                            service: document.getElementById('service-' + id).value,
+                            appointment_date: document.getElementById('date-' + id).value || null,
+                            appointment_time: document.getElementById('time-' + id).value || null,
+                            status: document.getElementById('status-' + id).value,
+                            price,
+                            notes: document.getElementById('notes-' + id).value
+                        })
+                    });
+
                     alert('Сохранено!');
                     loadOrders();
-                } else {
-                    alert('Ошибка: ' + JSON.stringify(error));
+                } catch (error) {
+                    alert('Ошибка: ' + error.message);
                 }
             }
 
             async function deleteOrder(id) {
-                if (confirm('Удалить заявку #' + id + '?')) {
-                    await client.from('orders').delete().eq('id', id);
+                if (!confirm('Удалить заявку #' + id + '?')) return;
+
+                try {
+                    await api('/api/orders/' + encodeURIComponent(id), { method: 'DELETE' });
                     loadOrders();
+                } catch (error) {
+                    alert('Ошибка: ' + error.message);
                 }
             }
 

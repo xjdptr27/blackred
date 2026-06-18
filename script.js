@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             generateBtn.disabled = true;
             generateBtn.innerHTML = 'ГЕНЕРИРУЮ...';
-            if (aiResponseDiv) aiResponseDiv.innerHTML = 'BLACKRED AI обрабатывает...';
+            if (aiResponseDiv) aiResponseDiv.innerHTML = 'BLACKRED AI генерирует...';
             if (aiImageContainer) aiImageContainer.style.display = 'none';
 
             try {
@@ -376,87 +376,101 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ========================
-    // ОТПРАВКА ФОРМЫ В SUPABASE
-    // ========================
-    const SUPABASE_URL = 'https://aoayarnbgaxcbmawyxhv.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_mkAZARtxqCq1j5_UdE-OEA_zm1TAe3y';
-    const contactBtn = document.querySelector('.contact-btn');
-    if (contactBtn) {
-        contactBtn.addEventListener('click', async function(e) {
-            e.preventDefault();
-
-            const name = document.getElementById('contactName')?.value.trim() || '';
-            const car = document.getElementById('contactCar')?.value.trim() || '';
-            const phone = document.getElementById('contactPhone')?.value.trim() || '';
-            const email = document.getElementById('contactEmail')?.value.trim() || '';
-            const service = document.getElementById('contactService')?.value || '';
-            const date = document.getElementById('contactDate')?.value || null;
-            const time = document.getElementById('contactTime')?.value || null;
-
-                        if (!name || !car || !phone) {
-                showFormMessage('Заполните имя, авто и телефон', false);
-                return;
-            }
-
-            if (!isValidPhone(phone)) {
-                showFormMessage('Введите корректный телефон (11 цифр)', false);
-                return;
-            }
-
-            if (email && !isValidEmail(email)) {
-                showFormMessage('Введите корректный email', false);
-                return;
-            }
-
-            try {
-                const response = await fetch(SUPABASE_URL + '/rest/v1/orders', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': 'Bearer ' + SUPABASE_KEY
-                    },
-                    body: JSON.stringify({
-                        client_name: name,
-                        car_model: car,
-                        phone: phone,
-                        email: email,
-                        service: service,
-                        appointment_date: date,
-                        appointment_time: time
-                    })
-                });
-
-                if (response.ok) {
-                    showFormMessage('Заявка отправлена! Мы свяжемся с вами.', true);
-                    document.getElementById('contactName').value = '';
-                    document.getElementById('contactCar').value = '';
-                    document.getElementById('contactPhone').value = '';
-                    document.getElementById('contactEmail').value = '';
-                    document.getElementById('contactDate').value = '';
-                } else {
-                    const err = await response.text();
-                    console.error('Supabase error:', err);
-                    throw new Error('Ошибка отправки');
-                }
-            } catch (error) {
-                console.error(error);
-                showFormMessage('Ошибка. Позвоните нам.', false);
-            }
-        });
-    }
-
-    function showFormMessage(msg, success) {
-        const msgDiv = document.getElementById('contactFormMessage');
-        if (msgDiv) {
-            msgDiv.style.display = 'block';
-            msgDiv.style.color = success ? '#4ade80' : '#dc2626';
-            msgDiv.textContent = msg;
-            setTimeout(function() { msgDiv.style.display = 'none'; }, 5000);
-        }
-    }
-
+// ОТПРАВКА ФОРМЫ ЧЕРЕЗ СЕРВЕР
 // ========================
+const contactBtn = document.querySelector('.contact-btn');
+
+if (contactBtn) {
+    contactBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+
+        const nameInput = document.getElementById('contactName');
+        const carInput = document.getElementById('contactCar');
+        const phoneInput = document.getElementById('contactPhone');
+        const emailInput = document.getElementById('contactEmail');
+        const serviceInput = document.getElementById('contactService');
+        const dateInput = document.getElementById('contactDate');
+        const timeInput = document.getElementById('contactTime');
+
+        const name = nameInput?.value.trim() || '';
+        const car = carInput?.value.trim() || '';
+        const phone = phoneInput?.value.trim() || '';
+        const email = emailInput?.value.trim() || '';
+        const service = serviceInput?.value || '';
+        const date = dateInput?.value || null;
+        const time = timeInput?.value || null;
+
+        if (!name || !car || !phone) {
+            showFormMessage('Заполните имя, авто и телефон', false);
+            return;
+        }
+
+        if (!isValidPhone(phone)) {
+            showFormMessage('Введите корректный телефон', false);
+            return;
+        }
+
+        if (email && !isValidEmail(email)) {
+            showFormMessage('Введите корректный email', false);
+            return;
+        }
+
+        const oldText = contactBtn.innerHTML;
+        contactBtn.disabled = true;
+        contactBtn.innerHTML = 'ОТПРАВЛЯЕМ...';
+
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    client_name: name,
+                    car_model: car,
+                    phone,
+                    email,
+                    service,
+                    appointment_date: date,
+                    appointment_time: time
+                })
+            });
+
+            let result = null;
+            try {
+                result = await response.json();
+            } catch (jsonError) {}
+
+            if (!response.ok || result?.ok === false) {
+                throw new Error(result?.error || 'Ошибка отправки заявки');
+            }
+
+            showFormMessage('Заявка отправлена! Мы свяжемся с вами.', true);
+            if (nameInput) nameInput.value = '';
+            if (carInput) carInput.value = '';
+            if (phoneInput) phoneInput.value = '';
+            if (emailInput) emailInput.value = '';
+            if (dateInput) dateInput.value = '';
+            if (timeInput) timeInput.value = '';
+        } catch (error) {
+            console.error(error);
+            showFormMessage(error.message || 'Ошибка. Позвоните нам.', false);
+        } finally {
+            contactBtn.disabled = false;
+            contactBtn.innerHTML = oldText;
+        }
+    });
+}
+
+function showFormMessage(msg, success) {
+    const msgDiv = document.getElementById('contactFormMessage');
+
+    if (msgDiv) {
+        msgDiv.style.display = 'block';
+        msgDiv.style.color = success ? '#4ade80' : '#dc2626';
+        msgDiv.textContent = msg;
+        setTimeout(function() { msgDiv.style.display = 'none'; }, 5000);
+    }
+}
+
 // АНИМАЦИИ ПРИ СКРОЛЛЕ
 // ========================
 const animatedElements = document.querySelectorAll(`
