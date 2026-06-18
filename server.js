@@ -12,6 +12,37 @@ const FREEIMAGE_KEY = process.env.FREEIMAGE_KEY;
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+function checkAdminPassword(req, res, next) {
+    if (!ADMIN_PASSWORD) {
+        return res.status(500).send('ADMIN_PASSWORD is not set on Render');
+    }
+
+    const authHeader = req.headers.authorization || '';
+    const base64Credentials = authHeader.split(' ')[1] || '';
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
+    const separatorIndex = credentials.indexOf(':');
+
+    const login = credentials.slice(0, separatorIndex);
+    const password = credentials.slice(separatorIndex + 1);
+
+    if (authHeader.startsWith('Basic ') && login === ADMIN_USER && password === ADMIN_PASSWORD) {
+        return next();
+    }
+
+    res.setHeader('WWW-Authenticate', 'Basic realm="BLACKRED Admin"');
+    return res.status(401).send('Требуется пароль администратора');
+}
+
+app.use(['/admin', '/admin.html'], checkAdminPassword);
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 app.use(express.static(__dirname));
 
 function apiRequest(url, method = 'GET', body = null, customHeaders = {}) {
