@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLACK RED | Премиум Детейлинг</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <!-- ШАПКА -->
+    <header class="site-header" id="siteHeader">
+        <div class="header-inner">
+            <a href="#hero" class="header-logo">BLACK<span>RED</span></a>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Открыть меню" aria-controls="headerNav" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="header-nav" id="headerNav">
+                <a href="#hero">Главная</a>
+                <a href="#advantages">Преимущества</a>
+                <a href="#services">Услуги</a>
+                <a href="#portfolio">Портфолио</a>
+                <a href="#constructor">Конструктор</a>
+                <a href="#contacts">Контакты</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Навигационные точки -->
+    <div class="nav-dots" id="navDots"></div>
+
+    <!-- Кнопка вверх -->
+    <div class="scroll-to-top" id="scrollToTop">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+        </svg>
+    </div>
+
+    <!-- HERO -->
+    <section class="fullscreen-section hero" id="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <h1>ДЕТЕЙЛИНГ<br>НОВОГО <span>УРОВНЯ</span></h1>
+                    <p class="hero-description">Оклейка премиальными плёнками, тонировка, защита кузова. Индивидуальный подход и пожизненная гарантия на все работы.</p>
+                    <div class="hero-buttons">
+                        <a href="#constructor" class="btn">СОЗДАТЬ ДИЗАЙН<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+                        <a href="#portfolio" class="btn btn-outline">СМОТРЕТЬ РАБОТЫ</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item"><span class="stat-number">10+</span><span class="stat-label">Лет опыта</span></div>
+                        <div class="stat-item"><span class="stat-number">500+</span><span class="stat-label">Проектов</span></div>
+                        <div class="stat-item"><span class="stat-number">100%</span><span class="stat-label">Гарантия</span></div>
+                    </div>
+                </div>
+                <div class="hero-image-wrapper">
+                    <img src="images/hero-porsche.jpg" alt="Porsche 911" class="hero-image" onerror="this.src='https://placehold.co/800x600/1a1a1a/dc2626?text=Porsche+911'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПРЕИМУЩЕСТВА -->
+    <section class="fullscreen-section" id="advantages">
+        <div class="container">
+            <h2>Почему выбирают нас</h2>
+            <p class="section-subtitle">Ключевые преимущества работы с нами</p>
+            <div class="grid-3">
+                <div class="feature-card">
+                    <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 48 48" fill="none"><path d="M24 4L6 12V22C6 33.1 13.68 43.22 24 46C34.32 43.22 42 33.1 42 22V12L24 4Z" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 24L22 30L32 18" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <h3>Пожизненная гарантия</h3>
+                    <p>Фиксируем обязательства в договоре. Устранение дефектов — за наш счёт в течение всего срока эксплуатации автомобиля.</p>
+                    <ul class="feature-list"><li>Бесплатное устранение дефектов</li><li>Замена материала при отслоении</li><li>Техподдержка 24/7</li></ul>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#dc2626" stroke-width="2.5"/></svg></div>
+                    <h3>450+ оттенков</h3>
+                    <p>Матовые, глянцевые, сатиновые покрытия. Карбон, камуфляж, эксклюзивные текстуры.</p>
+                    <div class="color-dots"><span style="background:#000;"></span><span style="background:#dc2626;"></span><span style="background:#2c2c2c;"></span><span style="background:#8b0000;"></span><span style="background:#1a1a2e;"></span></div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><svg width="36" height="36" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#dc2626" stroke-width="2.5"/><path d="M24 12V24L32 30" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+                    <h3>Сроки 1-3 дня</h3>
+                    <p>Полная оклейка — 3 дня, частичная — 1 день. Соблюдаем сроки по договору.</p>
+                    <div class="time-badge"><span>24h</span> экспресс-режим</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- УСЛУГИ -->
+    <section class="fullscreen-section" id="services">
+        <div class="container">
+            <h2>Услуги</h2>
+            <p class="section-subtitle">Полный спектр детейлинг-услуг для премиальных автомобилей</p>
+            <div class="service-showcase">
+                <div class="service-item"><img src="images/service-ppf.jpg" class="service-img" onerror="this.src='https://placehold.co/400x600/1a1a1a/dc2626?text=PPF'"><div class="service-overlay"><h3>Антигравийная плёнка</h3><p>Защита кузова от сколов, царапин и реагентов</p><span class="service-tag">от 45 000 ₽</span></div></div>
+                <div class="service-item"><img src="images/service-vinyl.jpg" class="service-img" onerror="this.src='https://placehold.co/400x600/1a1a1a/dc2626?text=VINYL'"><div class="service-overlay"><h3>Винилография</h3><p>Смена цвета автомобиля</p><span class="service-tag">от 80 000 ₽</span></div></div>
+                <div class="service-item"><img src="images/service-tint.jpg" class="service-img" onerror="this.src='https://placehold.co/400x600/1a1a1a/dc2626?text=TINT'"><div class="service-overlay"><h3>Тонировка стёкол</h3><p>Атермальная, зеркальная, карбоновая</p><span class="service-tag">от 15 000 ₽</span></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПОРТФОЛИО -->
+    <section class="fullscreen-section" id="portfolio">
+        <div class="container">
+            <h2>Наши работы</h2>
+            <p class="section-subtitle">Реализованные проекты</p>
+            <div class="portfolio-wrapper">
+                <button class="portfolio-arrow portfolio-arrow-left" id="portfolioPrev">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <div class="portfolio-grid-wrapper">
+                    <div class="portfolio-grid" id="portfolioGrid">
+                        <div class="portfolio-item"><img src="images/portfolio-1.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626?text=Porsche'"><div class="portfolio-caption"><h4>Porsche 911 Turbo S</h4><p>Матовый чёрный</p></div></div>
+                        <div class="portfolio-item"><img src="images/portfolio-2.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626?text=BMW'"><div class="portfolio-caption"><h4>BMW M4 Competition</h4><p>Красный сатин</p></div></div>
+                        <div class="portfolio-item"><img src="images/portfolio-3.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626?text=G63'"><div class="portfolio-caption"><h4>Mercedes-AMG G63</h4><p>Чёрный глянец</p></div></div>
+                        <div class="portfolio-item"><img src="images/portfolio-4.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626?text=Audi'"><div class="portfolio-caption"><h4>Audi RS6 Avant</h4><p>Серый сатин</p></div></div>
+                        <div class="portfolio-item"><img src="images/portfolio-5.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626?text=Urus'"><div class="portfolio-caption"><h4>Lamborghini Urus</h4><p>Матовый серый</p></div></div>
+                        <div class="portfolio-item"><img src="images/portfolio-6.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626?text=Tesla'"><div class="portfolio-caption"><h4>Tesla Model S Plaid</h4><p>Глянцевый чёрный</p></div></div>
+                        <div class="portfolio-item"><img src="images/portfolio-7.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626?text=X6'"><div class="portfolio-caption"><h4>BMW X6 M Competition</h4><p>Матовый синий</p></div></div>
+                        <div class="portfolio-item"><img src="images/portfolio-8.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626?text=Cayenne'"><div class="portfolio-caption"><h4>Porsche Cayenne Turbo</h4><p>Чёрный сатин</p></div></div>
+                    </div>
+                </div>
+                <button class="portfolio-arrow portfolio-arrow-right" id="portfolioNext">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+            </div>
+            <div class="portfolio-dots" id="portfolioDots"></div>
+        </div>
+    </section>
+
+    <!-- КОНСТРУКТОР -->
+    <section class="fullscreen-section" id="constructor">
+        <div class="container">
+            <h2>Конструктор дизайна</h2>
+            <p class="section-subtitle">Загрузите фото — нейросеть покажет результат оклейки</p>
+            <div class="constructor-panel">
+                <div class="constructor-grid">
+                    <div class="constructor-form">
+                        <div class="form-group">
+                            <label>Фото автомобиля</label>
+                            <div class="upload-area" id="uploadArea">
+                                <input type="file" id="carPhoto" accept="image/*" hidden>
+                                <div class="upload-placeholder" id="uploadPlaceholder">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                    <p>Перетащите фото сюда<br>или <span>нажмите для загрузки</span></p>
+                                    <span class="upload-hint">JPG, PNG до 10 МБ</span>
+                                </div>
+                                <img id="previewImage" class="upload-preview" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Цвет плёнки</label>
+                            <div class="color-picker">
+                                <div class="color-option selected" style="background:#000;" data-color="Black gloss"></div>
+                                <div class="color-option" style="background:#dc2626;" data-color="Red"></div>
+                                <div class="color-option" style="background:#2c2c2c;" data-color="Graphite"></div>
+                                <div class="color-option" style="background:#8b0000;" data-color="Burgundy"></div>
+                                <div class="color-option" style="background:#1a1a2e;" data-color="Blue"></div>
+                            </div>
+                            <input type="text" id="colorInput" class="color-text-input" value="Black gloss">
+                        </div>
+                        <div class="form-group">
+                            <label>Тонировка</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="tint" value="yes"> С тонировкой</label>
+                                <label><input type="radio" name="tint" value="no" checked> Без тонировки</label>
+                            </div>
+                        </div>
+                        <button id="generateBtn" class="btn btn-full btn-generate" disabled>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            СГЕНЕРИРОВАТЬ
+                        </button>
+                    </div>
+                    <div class="preview-card">
+                        <div class="preview-glow"></div>
+                        <div class="preview-header"><div class="preview-badge">AI</div><span>РЕЗУЛЬТАТ</span></div>
+                        <div class="preview-car-name" id="previewCarName">BLACKRED AI</div>
+                        <div class="preview-desc" id="aiResponse">Загрузите фото и нажмите «Сгенерировать»</div>
+                        <div class="preview-meta" id="previewMeta"><span class="meta-tag">Ожидание загрузки</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- СТУДИЯ -->
+    <section class="fullscreen-section" id="studio">
+        <div class="container">
+            <h2>Процесс работы</h2>
+            <p class="section-subtitle">Этапы подготовки и оклейки автомобиля</p>
+            <div class="studio-grid">
+                <div class="studio-item"><img src="images/studio-1.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Полировка кузова</h4><p>Удаление царапин и голограмм</p></div></div>
+                <div class="studio-item"><img src="images/studio-2.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Подготовка поверхности</h4><p>Обезжиривание и очистка</p></div></div>
+                <div class="studio-item"><img src="images/studio-3.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Оклейка плёнкой</h4><p>Точная подгонка материала</p></div></div>
+                <div class="studio-item"><img src="images/studio-4.jpg" onerror="this.src='https://placehold.co/400x400/1a1a1a/dc2626'"><div class="studio-caption"><h4>Финальный осмотр</h4><p>Контроль качества</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ОТЗЫВЫ -->
+    <section class="fullscreen-section" id="reviews">
+        <div class="container">
+            <h2>Отзывы клиентов</h2>
+            <p class="section-subtitle">Более 500 выполненных проектов</p>
+            <div class="grid-3">
+                <div class="review-card"><div class="review-stars">★★★★★</div><p class="review-text">«Оклеил M4 в красный сатин — результат превзошёл ожидания. Качество на высоте.»</p><div class="review-author"><div class="review-author-avatar">АВ</div><div><h4>Артем В.</h4><p class="review-car">BMW M4 Competition</p></div></div></div>
+                <div class="review-card"><div class="review-stars">★★★★★</div><p class="review-text">«Конструктор помог подобрать цвет. Реализация точно по макету.»</p><div class="review-author"><div class="review-author-avatar">ЕМ</div><div><h4>Екатерина М.</h4><p class="review-car">Porsche Cayenne Turbo</p></div></div></div>
+                <div class="review-card"><div class="review-stars">★★★★★</div><p class="review-text">«Тонировка и полная броня. Быстро и аккуратно. Рекомендую.»</p><div class="review-author"><div class="review-author-avatar">ДК</div><div><h4>Дмитрий К.</h4><p class="review-car">Mercedes S 500</p></div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="fullscreen-section" id="faq">
+        <div class="container">
+            <h2>Часто задаваемые вопросы</h2>
+	    <p class="section-subtitle">Честные ответы на популярные вопросы</p>
+            <div class="faq-list">
+                <div class="faq-item"><div class="faq-question"><h3>Сколько прослужит плёнка?</h3><span class="faq-icon">+</span></div><div class="faq-answer"><p>5–7 лет при правильном уходе. Гарантия — 3 года на материалы и работу.</p></div></div>
+                <div class="faq-item"><div class="faq-question"><h3>Когда можно мыть автомобиль?</h3><span class="faq-icon">+</span></div><div class="faq-answer"><p>Первая мойка — через 5–7 дней. Далее — бесконтактная мойка с нейтральным pH.</p></div></div>
+                <div class="faq-item"><div class="faq-question"><h3>Плёнка вредит ЛКП?</h3><span class="faq-icon">+</span></div><div class="faq-answer"><p>Нет. Качественная полиуретановая плёнка химически нейтральна и не взаимодействует с лакокрасочным покрытием.</p></div></div>
+                <div class="faq-item"><div class="faq-question"><h3>Сколько времени занимает полная оклейка?</h3><span class="faq-icon">+</span></div><div class="faq-answer"><p>Седан или купе — 3–4 дня. Внедорожник — до 5 дней. Частичная оклейка — 1–2 дня.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- КОНТАКТЫ -->
+    <section class="fullscreen-section" id="contacts">
+        <div class="container">
+            <h2>Контакты</h2>
+            <p class="section-subtitle">Оставьте заявку — перезвоним в течение 15 минут</p>
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <h3 class="contact-title">BLACK RED STUDIO</h3>
+                    <p class="contact-description">Премиум детейлинг в Краснодаре. Работаем без выходных с 2015 года.</p>
+                    <div class="contact-detail">
+                        <div class="contact-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </div>
+                        Краснодар, ул. Герцена, 152
+                    </div>
+                    <div class="contact-detail">
+                        <div class="contact-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </div>
+                        blackred2026@hotmail.com
+                    </div>
+                    <div class="contact-detail">
+                        <div class="contact-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        Ежедневно 10:00 – 21:00
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <input type="text" placeholder="Ваше имя" class="contact-input" id="contactName" required>
+                    <input type="text" placeholder="Марка и модель автомобиля" class="contact-input" id="contactCar" required>
+                    <input type="tel" placeholder="+7 (999) 999-99-99" class="contact-input" id="contactPhone" required>
+                    <input type="email" placeholder="example@mail.ru" class="contact-input" id="contactEmail">
+                    <select class="contact-input" id="contactService" style="width:100%;padding:16px 20px;background:#0a0a0a;border:1.5px solid #2a2a2a;border-radius:14px;color:white;font-size:1rem;font-family:'Inter',sans-serif;">
+                        <option value="">Выберите услугу</option>
+                        <option value="Антигравийная плёнка">Антигравийная плёнка</option>
+                        <option value="Винилография">Винилография</option>
+                        <option value="Тонировка">Тонировка</option>
+                        <option value="Полировка">Полировка</option>
+                        <option value="Полная оклейка">Полная оклейка</option>
+                    </select>
+                    <div class="contact-datetime">
+                        <input type="date" class="contact-input" id="contactDate" min="">
+                        <input type="time" class="contact-input" id="contactTime" min="10:00" max="21:00" step="600" value="10:00">
+                    </div>
+                    <button class="btn btn-full contact-btn">ОТПРАВИТЬ ЗАЯВКУ</button>
+                    <div id="contactFormMessage" style="margin-top:12px;font-size:0.85rem;display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ФУТЕР -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo"><h3>BLACK<span>RED</span></h3><p>Премиум детейлинг студия с 2015 года.</p></div>
+                <div class="footer-links"><h4>Навигация</h4><ul><li><a href="#hero">Главная</a></li><li><a href="#advantages">Преимущества</a></li><li><a href="#services">Услуги</a></li><li><a href="#constructor">Конструктор</a></li></ul></div>
+                <div class="footer-services"><h4>Услуги</h4><ul><li><a href="#services">Оклейка</a></li><li><a href="#services">Тонировка</a></li><li><a href="#services">Защита</a></li><li><a href="#services">Полировка</a></li></ul></div>
+                <div class="footer-contacts"><h4>Контакты</h4><p>Краснодар, ул. Герцена, 152</p><p>blackred2026@hotmail.com</p><p>Ежедневно 10:00 – 21:00</p></div>
+            </div>
+            <div class="footer-bottom"><p>© 2026 BLACKRED. Все права защищены.</p></div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
