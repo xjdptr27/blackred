@@ -2085,3 +2085,15 @@ h2 {
         padding: 74px 0 36px;
     }
 }
+
+/* ===== Процесс работы: на ПК без кнопок листания ===== */
+@media (min-width: 1025px) {
+    .studio-arrow,
+    .studio-dots {
+        display: none;
+    }
+
+    .studio-grid {
+        transform: none !important;
+    }
+}
