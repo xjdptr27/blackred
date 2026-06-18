@@ -3,47 +3,147 @@ const cors = require('cors');
 const https = require('https');
 const http = require('http');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 const ADMIN_USER = process.env.ADMIN_USER || process.env.ADMIN_LOGIN || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_SESSION_HOURS = Number(process.env.ADMIN_SESSION_HOURS || 12);
 
 const QWEN_API_KEY = process.env.QWEN_API_KEY;
 const FREEIMAGE_KEY = process.env.FREEIMAGE_KEY;
 
-const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY;
+function normalizeSupabaseUrl(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
 
-app.use(cors());
+    try {
+        const parsed = new URL(raw);
+        return `${parsed.protocol}//${parsed.host}`;
+    } catch (error) {
+        return raw.replace(/\/rest\/v1.*$/, '').replace(/\/$/, '');
+    }
+}
+
+const SUPABASE_URL = normalizeSupabaseUrl(process.env.SUPABASE_URL);
+const SUPABASE_KEY = String(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY || '').trim();
+
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-function requireAdminAuth(req, res, next) {
-    if (!ADMIN_PASSWORD) {
-        res.setHeader('WWW-Authenticate', 'Basic realm="BLACKRED Admin"');
-        return res.status(500).send('ADMIN_PASSWORD is not set on Render');
+const ADMIN_COOKIE_NAME = 'blackred_admin_session';
+
+function base64UrlEncode(value) {
+    return Buffer.from(value).toString('base64url');
+}
+
+function base64UrlDecode(value) {
+    return Buffer.from(value, 'base64url').toString('utf8');
+}
+
+function getCookie(req, name) {
+    const cookieHeader = req.headers.cookie || '';
+    const cookies = cookieHeader.split(';').map((item) => item.trim()).filter(Boolean);
+
+    for (const cookie of cookies) {
+        const separatorIndex = cookie.indexOf('=');
+        const cookieName = separatorIndex >= 0 ? cookie.slice(0, separatorIndex) : cookie;
+        const cookieValue = separatorIndex >= 0 ? cookie.slice(separatorIndex + 1) : '';
+
+        if (cookieName === name) {
+            return decodeURIComponent(cookieValue);
+        }
     }
 
-    const authHeader = req.headers.authorization || '';
+    return '';
+}
 
-    if (!authHeader.startsWith('Basic ')) {
-        res.setHeader('WWW-Authenticate', 'Basic realm="BLACKRED Admin"');
-        return res.status(401).send('Введите логин и пароль');
+function getCookieString(req, name, value, options = {}) {
+    const parts = [`${name}=${encodeURIComponent(value)}`];
+
+    if (options.maxAge !== undefined) parts.push(`Max-Age=${options.maxAge}`);
+    if (options.httpOnly !== false) parts.push('HttpOnly');
+    parts.push('Path=/');
+    parts.push('SameSite=Lax');
+
+    const forwardedProto = req.headers['x-forwarded-proto'];
+    if (forwardedProto === 'https' || process.env.RENDER) {
+        parts.push('Secure');
     }
 
-    const credentials = Buffer.from(authHeader.slice(6), 'base64').toString('utf8');
-    const separatorIndex = credentials.indexOf(':');
-    const login = separatorIndex >= 0 ? credentials.slice(0, separatorIndex) : '';
-    const password = separatorIndex >= 0 ? credentials.slice(separatorIndex + 1) : '';
+    return parts.join('; ');
+}
 
-    if (login === ADMIN_USER && password === ADMIN_PASSWORD) {
+function getAdminSecret() {
+    return String(ADMIN_PASSWORD || '');
+}
+
+function signPayload(payloadBase64) {
+    return crypto
+        .createHmac('sha256', getAdminSecret())
+        .update(payloadBase64)
+        .digest('base64url');
+}
+
+function safeCompare(a, b) {
+    const left = Buffer.from(String(a));
+    const right = Buffer.from(String(b));
+
+    if (left.length !== right.length) return false;
+    return crypto.timingSafeEqual(left, right);
+}
+
+function createAdminToken() {
+    const now = Date.now();
+    const payload = {
+        user: ADMIN_USER,
+        iat: now,
+        exp: now + ADMIN_SESSION_HOURS * 60 * 60 * 1000
+    };
+
+    const payloadBase64 = base64UrlEncode(JSON.stringify(payload));
+    const signature = signPayload(payloadBase64);
+
+    return `${payloadBase64}.${signature}`;
+}
+
+function verifyAdminToken(token) {
+    if (!ADMIN_PASSWORD || !token || !token.includes('.')) return false;
+
+    const [payloadBase64, signature] = token.split('.');
+    const expectedSignature = signPayload(payloadBase64);
+
+    if (!safeCompare(signature, expectedSignature)) return false;
+
+    try {
+        const payload = JSON.parse(base64UrlDecode(payloadBase64));
+        if (payload.user !== ADMIN_USER) return false;
+        if (!payload.exp || Date.now() > payload.exp) return false;
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+function isAdminLoggedIn(req) {
+    const token = getCookie(req, ADMIN_COOKIE_NAME);
+    return verifyAdminToken(token);
+}
+
+function requireAdminSession(req, res, next) {
+    if (isAdminLoggedIn(req)) {
         return next();
     }
 
-    res.setHeader('WWW-Authenticate', 'Basic realm="BLACKRED Admin"');
-    return res.status(401).send('Неверный логин или пароль');
+    const wantsHtml = req.accepts('html') && !req.path.startsWith('/api/');
+    if (wantsHtml) {
+        return res.redirect('/admin-login');
+    }
+
+    return res.status(401).json({ ok: false, error: 'Требуется вход в админ-панель' });
 }
 
 function sendJsonError(res, status, message, details = null) {
@@ -63,7 +163,10 @@ function ensureSupabaseConfig() {
 async function supabaseRequest(restPath, options = {}) {
     ensureSupabaseConfig();
 
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/${restPath}`, {
+    const url = `${SUPABASE_URL}/rest/v1/${restPath}`;
+    console.log('Supabase request:', options.method || 'GET', url);
+
+    const response = await fetch(url, {
         method: options.method || 'GET',
         headers: {
             apikey: SUPABASE_KEY,
@@ -137,18 +240,116 @@ function normalizeOrderBody(body, isAdminUpdate = false) {
     return payload;
 }
 
+function getBusinessTodayISO() {
+    const parts = new Intl.DateTimeFormat('ru-RU', {
+        timeZone: 'Europe/Moscow',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(new Date());
+
+    const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${map.year}-${map.month}-${map.day}`;
+}
+
+function isValidISODate(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return false;
+
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+
+    return date.getUTCFullYear() === year
+        && date.getUTCMonth() === month - 1
+        && date.getUTCDate() === day;
+}
+
+function normalizeTimeValue(value) {
+    const text = String(value || '').trim();
+    const match = text.match(/^(\d{2}):(\d{2})(?::\d{2})?$/);
+
+    if (!match) return null;
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+
+    if (hours > 23 || minutes > 59) return null;
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+function isBusinessTime(value) {
+    const normalized = normalizeTimeValue(value);
+    if (!normalized) return false;
+
+    const [hours, minutes] = normalized.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes;
+    const minMinutes = 10 * 60;
+    const maxMinutes = 21 * 60;
+
+    return totalMinutes >= minMinutes && totalMinutes <= maxMinutes;
+}
+
+function validateAppointment(payload) {
+    if (payload.appointment_date) {
+        if (!isValidISODate(payload.appointment_date)) {
+            return 'Выберите корректную дату в календаре';
+        }
+
+        const today = getBusinessTodayISO();
+        if (payload.appointment_date < today) {
+            return 'Нельзя выбрать дату, которая уже прошла';
+        }
+    }
+
+    if (payload.appointment_time) {
+        const normalized = normalizeTimeValue(payload.appointment_time);
+
+        if (!normalized) {
+            return 'Выберите корректное время';
+        }
+
+        payload.appointment_time = normalized;
+
+        if (!isBusinessTime(payload.appointment_time)) {
+            return 'Время заявки должно быть с 10:00 до 21:00';
+        }
+    }
+
+    return null;
+}
+
 function validatePublicOrder(payload) {
     if (!payload.client_name || !payload.car_model || !payload.phone) {
         return 'Заполните имя, авто и телефон';
     }
 
     const digits = payload.phone.replace(/\D/g, '');
-    if (digits.length < 10) {
+    if (digits.length !== 11) {
         return 'Введите корректный номер телефона';
     }
 
     if (payload.email && !/^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(payload.email)) {
         return 'Введите корректный email';
+    }
+
+    return validateAppointment(payload);
+}
+
+function validateAdminOrder(payload) {
+    const appointmentError = validateAppointment(payload);
+    if (appointmentError) return appointmentError;
+
+    if (payload.email && !/^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(payload.email)) {
+        return 'Введите корректный email';
+    }
+
+    if (payload.phone) {
+        const digits = payload.phone.replace(/\D/g, '');
+        if (digits.length !== 11) return 'Телефон должен содержать 11 цифр';
+    }
+
+    if (payload.price && !/^\d+$/.test(String(payload.price))) {
+        return 'Цена должна содержать только цифры';
     }
 
     return null;
@@ -162,11 +363,52 @@ app.get('/health', (req, res) => {
     res.json({ ok: true });
 });
 
-app.get('/admin', requireAdminAuth, (req, res) => {
+app.get('/admin-login', (req, res) => {
+    if (isAdminLoggedIn(req)) {
+        return res.redirect('/admin');
+    }
+
+    return res.sendFile(path.join(__dirname, 'admin-login.html'));
+});
+
+app.post('/api/admin/login', (req, res) => {
+    try {
+        if (!ADMIN_PASSWORD) {
+            return sendJsonError(res, 500, 'ADMIN_PASSWORD не задан в Render → Environment');
+        }
+
+        const login = cleanString(req.body.login || req.body.username);
+        const password = String(req.body.password || '');
+
+        if (login === ADMIN_USER && password === ADMIN_PASSWORD) {
+            const token = createAdminToken();
+            res.setHeader('Set-Cookie', getCookieString(req, ADMIN_COOKIE_NAME, token, {
+                maxAge: ADMIN_SESSION_HOURS * 60 * 60
+            }));
+            return res.json({ ok: true });
+        }
+
+        return sendJsonError(res, 401, 'Неверный логин или пароль');
+    } catch (error) {
+        console.error('Admin login error:', error);
+        return sendJsonError(res, 500, 'Ошибка входа');
+    }
+});
+
+app.get('/api/admin/me', (req, res) => {
+    return res.json({ ok: true, authenticated: isAdminLoggedIn(req) });
+});
+
+app.post('/api/admin/logout', (req, res) => {
+    res.setHeader('Set-Cookie', getCookieString(req, ADMIN_COOKIE_NAME, '', { maxAge: 0 }));
+    return res.json({ ok: true });
+});
+
+app.get('/admin', requireAdminSession, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
-app.get('/admin.html', requireAdminAuth, (req, res) => {
+app.get('/admin.html', requireAdminSession, (req, res) => {
     res.redirect('/admin');
 });
 
@@ -192,7 +434,7 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
-app.get('/api/orders', requireAdminAuth, async (req, res) => {
+app.get('/api/orders', requireAdminSession, async (req, res) => {
     try {
         const status = cleanString(req.query.status);
         let restPath = 'orders?select=*&order=created_at.desc';
@@ -209,12 +451,17 @@ app.get('/api/orders', requireAdminAuth, async (req, res) => {
     }
 });
 
-app.put('/api/orders/:id', requireAdminAuth, async (req, res) => {
+app.put('/api/orders/:id', requireAdminSession, async (req, res) => {
     try {
         const payload = normalizeOrderBody(req.body, true);
 
         if (Object.keys(payload).length === 0) {
             return sendJsonError(res, 400, 'Нет данных для сохранения');
+        }
+
+        const validationError = validateAdminOrder(payload);
+        if (validationError) {
+            return sendJsonError(res, 400, validationError);
         }
 
         const data = await supabaseRequest(`orders?id=eq.${idFilter(req.params.id)}`, {
@@ -234,7 +481,7 @@ app.put('/api/orders/:id', requireAdminAuth, async (req, res) => {
     }
 });
 
-app.delete('/api/orders/:id', requireAdminAuth, async (req, res) => {
+app.delete('/api/orders/:id', requireAdminSession, async (req, res) => {
     try {
         const data = await supabaseRequest(`orders?id=eq.${idFilter(req.params.id)}`, {
             method: 'DELETE',

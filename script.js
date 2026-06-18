@@ -20,16 +20,81 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ========================
-    // ДАТА: ОТ СЕГОДНЯ
+    // ДАТА И ВРЕМЯ ЗАЯВКИ
     // ========================
     const dateInput = document.getElementById('contactDate');
-    if (dateInput) {
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
-        
-        const maxDate = new Date();
-        maxDate.setMonth(maxDate.getMonth() + 1);
-        dateInput.setAttribute('max', maxDate.toISOString().split('T')[0]);
+    const timeInput = document.getElementById('contactTime');
+
+    function getLocalDateISO(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function setupAppointmentInputs() {
+        const today = getLocalDateISO();
+
+        if (dateInput) {
+            dateInput.type = 'date';
+            dateInput.setAttribute('min', today);
+
+            const maxDate = new Date();
+            maxDate.setMonth(maxDate.getMonth() + 2);
+            dateInput.setAttribute('max', getLocalDateISO(maxDate));
+
+            if (dateInput.value && dateInput.value < today) {
+                dateInput.value = today;
+            }
+
+            dateInput.addEventListener('click', function() {
+                if (typeof dateInput.showPicker === 'function') {
+                    try { dateInput.showPicker(); } catch (error) {}
+                }
+            });
+
+            dateInput.addEventListener('change', function() {
+                if (dateInput.value && dateInput.value < today) {
+                    dateInput.value = today;
+                    showFormMessage('Нельзя выбрать прошедшую дату', false);
+                }
+            });
+        }
+
+        if (timeInput) {
+            timeInput.type = 'time';
+            timeInput.setAttribute('min', '10:00');
+            timeInput.setAttribute('max', '21:00');
+            timeInput.setAttribute('step', '600');
+            if (!timeInput.value) timeInput.value = '10:00';
+
+            timeInput.addEventListener('change', function() {
+                if (timeInput.value && timeInput.value < '10:00') {
+                    timeInput.value = '10:00';
+                    showFormMessage('Время заявки доступно с 10:00', false);
+                }
+                if (timeInput.value && timeInput.value > '21:00') {
+                    timeInput.value = '21:00';
+                    showFormMessage('Время заявки доступно до 21:00', false);
+                }
+            });
+        }
+    }
+
+    setupAppointmentInputs();
+
+    function validateAppointment(date, time) {
+        const today = getLocalDateISO();
+
+        if (date && date < today) {
+            return 'Нельзя выбрать дату, которая уже прошла';
+        }
+
+        if (time && (time < '10:00' || time > '21:00')) {
+            return 'Время заявки должно быть с 10:00 до 21:00';
+        }
+
+        return '';
     }
 
     // ========================
@@ -412,6 +477,12 @@ if (contactBtn) {
 
         if (email && !isValidEmail(email)) {
             showFormMessage('Введите корректный email', false);
+            return;
+        }
+
+        const appointmentError = validateAppointment(date, time);
+        if (appointmentError) {
+            showFormMessage(appointmentError, false);
             return;
         }
 

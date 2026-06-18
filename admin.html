@@ -3,249 +3,568 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLACKRED | Админка</title>
+    <title>BLACKRED | Управление заявками</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #111; color: #fff; padding: 32px; }
-        .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-        h1 { color: #dc2626; font-size: 1.6rem; }
-        h1 span { color: #fff; font-size: 1rem; margin-left: 10px; font-weight: 400; }
-        a { color: #fff; text-decoration: none; }
-        .top-actions { display: flex; gap: 10px; align-items: center; }
-        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .filter-btn, .refresh-btn { padding: 8px 18px; border: 1px solid #333; border-radius: 20px; background: transparent; color: #bbb; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
-        .filter-btn:hover, .filter-btn.active, .refresh-btn:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
-        .status-line { margin-bottom: 18px; color: #999; min-height: 20px; }
-        .table-wrap { overflow-x: auto; border-radius: 12px; background: #1a1a1a; }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #2a2a2a; font-size: 0.9rem; vertical-align: top; }
-        th { background: #dc2626; color: #fff; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; }
-        tr:hover { background: #222; }
-        input, select { background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; width: 100%; }
-        input[type="date"], input[type="time"] { min-width: 125px; }
-        .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; margin: 2px; white-space: nowrap; }
-        .btn-save { background: #16a34a; color: #fff; }
-        .btn-delete { background: #333; color: #fff; }
-        .btn-delete:hover { background: #dc2626; }
-        .empty { text-align: center; padding: 40px; color: #666; }
-        .error { color: #ff6b6b; }
-        .ok { color: #4ade80; }
+        :root {
+            --red: #ef2429;
+            --red-dark: #a8171b;
+            --black: #050505;
+            --panel: rgba(19, 19, 21, 0.88);
+            --panel-2: rgba(255, 255, 255, 0.045);
+            --border: rgba(255, 255, 255, 0.09);
+            --border-red: rgba(239, 36, 41, 0.32);
+            --text: #fff;
+            --muted: rgba(255, 255, 255, 0.58);
+            --green: #22c55e;
+            --yellow: #f59e0b;
+        }
+        body {
+            min-height: 100vh;
+            font-family: Inter, Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 18% 0%, rgba(239,36,41,0.18), transparent 28%),
+                radial-gradient(circle at 86% 18%, rgba(239,36,41,0.10), transparent 30%),
+                linear-gradient(135deg, #050505 0%, #120709 46%, #000 100%);
+            padding: 30px;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+            background-size: 56px 56px;
+            pointer-events: none;
+            opacity: .55;
+        }
+        .app { position: relative; max-width: 1600px; margin: 0 auto; }
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .brand { display: flex; align-items: center; gap: 16px; }
+        .logo {
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--red), #7f1115);
+            box-shadow: 0 18px 42px rgba(239,36,41,.22);
+            font-weight: 950;
+            letter-spacing: -0.08em;
+        }
+        .brand h1 {
+            font-size: clamp(26px, 4vw, 46px);
+            line-height: .95;
+            letter-spacing: -0.07em;
+            text-transform: uppercase;
+        }
+        .brand h1 span { color: var(--red); }
+        .brand p { margin-top: 8px; color: var(--muted); font-size: 14px; }
+        .top-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .btn {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: .03em;
+            transition: .2s;
+        }
+        .btn:hover { transform: translateY(-1px); border-color: rgba(239,36,41,.55); }
+        .btn-red { background: linear-gradient(135deg, var(--red), var(--red-dark)); border-color: transparent; box-shadow: 0 14px 34px rgba(239,36,41,.18); }
+        .btn-dark { background: rgba(0,0,0,.32); }
+        .btn-green { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.28); color: #8ef0af; }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .stat {
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.022));
+            backdrop-filter: blur(16px);
+            min-height: 112px;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat::after {
+            content: '';
+            position: absolute;
+            right: -46px;
+            top: -54px;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: rgba(239,36,41,.10);
+        }
+        .stat span { color: var(--muted); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+        .stat strong { display: block; margin-top: 14px; font-size: 34px; letter-spacing: -0.04em; }
+        .panel {
+            border: 1px solid var(--border-red);
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(18,18,20,.93), rgba(7,7,8,.94));
+            box-shadow: 0 32px 100px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+            overflow: hidden;
+        }
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255,255,255,.035);
+            color: var(--muted);
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s;
+        }
+        .filter-btn:hover, .filter-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+        .search-box {
+            width: min(420px, 100%);
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            height: 44px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,.34);
+            color: #fff;
+            padding: 0 16px;
+            outline: none;
+        }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1250px; }
+        th, td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,.075); text-align: left; vertical-align: top; }
+        th {
+            color: rgba(255,255,255,.72);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .09em;
+            background: rgba(255,255,255,.035);
+            white-space: nowrap;
+        }
+        tr:hover td { background: rgba(255,255,255,.024); }
+        .id-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            height: 30px;
+            border-radius: 999px;
+            background: rgba(239,36,41,.12);
+            color: #ff888b;
+            font-weight: 900;
+        }
+        input, select, textarea {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,.10);
+            background: rgba(0,0,0,.34);
+            color: #fff;
+            border-radius: 12px;
+            padding: 10px 11px;
+            outline: none;
+            font-family: inherit;
+            font-size: 13px;
+        }
+        textarea { resize: vertical; min-height: 42px; }
+        input:focus, select:focus, textarea:focus { border-color: rgba(239,36,41,.7); box-shadow: 0 0 0 3px rgba(239,36,41,.10); }
+        input[type="date"], input[type="time"] { min-width: 132px; color-scheme: dark; }
+        .status-select { min-width: 135px; }
+        .row-actions { display: flex; gap: 7px; flex-wrap: wrap; min-width: 158px; }
+        .small-btn {
+            padding: 9px 10px;
+            border-radius: 11px;
+            border: 1px solid rgba(255,255,255,.1);
+            background: rgba(255,255,255,.045);
+            color: #fff;
+            font-weight: 850;
+            cursor: pointer;
+        }
+        .small-btn.save { background: rgba(34,197,94,.13); border-color: rgba(34,197,94,.24); color: #9ff2bb; }
+        .small-btn.delete { background: rgba(239,36,41,.10); border-color: rgba(239,36,41,.23); color: #ff9698; }
+        .empty, .loading {
+            padding: 52px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 16px;
+        }
+        .toast {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            max-width: 420px;
+            padding: 15px 18px;
+            border-radius: 16px;
+            background: rgba(12,12,14,.94);
+            border: 1px solid rgba(255,255,255,.12);
+            box-shadow: 0 20px 70px rgba(0,0,0,.48);
+            color: #fff;
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: .22s;
+            z-index: 10;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { border-color: rgba(34,197,94,.35); }
+        .toast.error { border-color: rgba(239,36,41,.45); }
+        .mobile-cards { display: none; padding: 14px; gap: 14px; }
+        .order-card {
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,.035);
+        }
+        .order-card-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; align-items: center; }
+        .order-card-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (max-width: 980px) {
+            body { padding: 18px; }
+            .topbar { align-items: flex-start; flex-direction: column; }
+            .dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 720px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .table-wrap { display: none; }
+            .mobile-cards { display: grid; }
+            .panel-head { align-items: stretch; }
+            .filters, .search-box { width: 100%; }
+            .filter-btn { flex: 1; }
+        }
     </style>
 </head>
 <body>
-    <div class="top">
-        <h1>BLACKRED <span>| Управление заявками</span></h1>
-        <div class="top-actions">
-            <a href="/">На сайт</a>
-            <button class="refresh-btn" id="refreshBtn">Обновить</button>
-        </div>
+    <div class="app">
+        <header class="topbar">
+            <div class="brand">
+                <div class="logo">BR</div>
+                <div>
+                    <h1>BLACK<span>RED</span></h1>
+                    <p>Панель управления заявками и статусами клиентов</p>
+                </div>
+            </div>
+            <div class="top-actions">
+                <button class="btn btn-dark" id="refreshBtn">Обновить</button>
+                <a class="btn btn-dark" href="/" style="text-decoration:none;">На сайт</a>
+                <button class="btn btn-red" id="logoutBtn">Выйти</button>
+            </div>
+        </header>
+
+        <section class="dashboard">
+            <div class="stat"><span>Всего заявок</span><strong id="statTotal">0</strong></div>
+            <div class="stat"><span>Новые</span><strong id="statNew">0</strong></div>
+            <div class="stat"><span>В работе</span><strong id="statWork">0</strong></div>
+            <div class="stat"><span>Выполнены</span><strong id="statDone">0</strong></div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="Все">Все</button>
+                    <button class="filter-btn" data-filter="Новая">Новые</button>
+                    <button class="filter-btn" data-filter="В работе">В работе</button>
+                    <button class="filter-btn" data-filter="Выполнена">Выполненные</button>
+                    <button class="filter-btn" data-filter="Отменена">Отменённые</button>
+                </div>
+                <div class="search-box">
+                    <input id="searchInput" type="search" placeholder="Поиск: клиент, авто, телефон, услуга...">
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Клиент</th>
+                            <th>Авто</th>
+                            <th>Телефон</th>
+                            <th>Email</th>
+                            <th>Услуга</th>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Статус</th>
+                            <th>Цена</th>
+                            <th>Заметки</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersBody">
+                        <tr><td colspan="12" class="loading">Загружаем заявки...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mobile-cards" id="mobileCards"></div>
+        </section>
     </div>
 
-    <div class="filters">
-        <button class="filter-btn active" data-filter="all">Все</button>
-        <button class="filter-btn" data-filter="Новая">Новые</button>
-        <button class="filter-btn" data-filter="В работе">В работе</button>
-        <button class="filter-btn" data-filter="Выполнена">Выполненные</button>
-        <button class="filter-btn" data-filter="Отменена">Отменённые</button>
-    </div>
-
-    <div class="status-line" id="statusLine">Загрузка заявок...</div>
-
-    <div class="table-wrap">
-        <table id="ordersTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Создана</th>
-                    <th>Клиент</th>
-                    <th>Авто</th>
-                    <th>Телефон</th>
-                    <th>Email</th>
-                    <th>Услуга</th>
-                    <th>Дата</th>
-                    <th>Время</th>
-                    <th>Статус</th>
-                    <th>Цена</th>
-                    <th>Заметки</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    <div class="toast" id="toast"></div>
 
     <script>
         (function() {
+            const ordersBody = document.getElementById('ordersBody');
+            const mobileCards = document.getElementById('mobileCards');
+            const searchInput = document.getElementById('searchInput');
+            const toast = document.getElementById('toast');
+            const statuses = ['Новая', 'В работе', 'Выполнена', 'Отменена'];
             let allOrders = [];
-            let currentFilter = 'all';
+            let currentFilter = 'Все';
 
-            const statusLine = document.getElementById('statusLine');
-            const tbody = document.querySelector('#ordersTable tbody');
-            const refreshBtn = document.getElementById('refreshBtn');
+            function getTodayISO() {
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
 
-            document.querySelectorAll('.filter-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    currentFilter = this.dataset.filter;
-                    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-                    this.classList.add('active');
-                    renderOrders();
-                });
-            });
+            function esc(value) {
+                return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
 
-            if (refreshBtn) refreshBtn.addEventListener('click', loadOrders);
+            function showToast(message, type) {
+                toast.textContent = message;
+                toast.className = 'toast show ' + (type || 'success');
+                setTimeout(() => { toast.className = 'toast'; }, 3200);
+            }
 
-            async function api(url, options) {
-                const response = await fetch(url, {
-                    credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
-                    ...(options || {})
+            async function api(path, options = {}) {
+                const response = await fetch(path, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    }
                 });
 
                 let result = null;
-                try {
-                    result = await response.json();
-                } catch (error) {}
+                try { result = await response.json(); } catch (e) {}
+
+                if (response.status === 401) {
+                    window.location.href = '/admin-login';
+                    throw new Error('Нужно войти заново');
+                }
 
                 if (!response.ok || result?.ok === false) {
-                    throw new Error(result?.error || 'Ошибка запроса');
+                    throw new Error(result?.error || 'Ошибка сервера');
                 }
 
                 return result;
             }
 
-            async function loadOrders() {
-                try {
-                    statusLine.className = 'status-line';
-                    statusLine.textContent = 'Загрузка заявок...';
-                    const result = await api('/api/orders');
-                    allOrders = result.orders || [];
-                    statusLine.className = 'status-line ok';
-                    statusLine.textContent = 'Загружено заявок: ' + allOrders.length;
-                    renderOrders();
-                } catch (error) {
-                    console.error(error);
-                    allOrders = [];
-                    tbody.innerHTML = '<tr><td colspan="13" class="empty error">' + esc(error.message) + '</td></tr>';
-                    statusLine.className = 'status-line error';
-                    statusLine.textContent = 'Ошибка загрузки заявок';
-                }
+            function setStats() {
+                document.getElementById('statTotal').textContent = allOrders.length;
+                document.getElementById('statNew').textContent = allOrders.filter(o => o.status === 'Новая').length;
+                document.getElementById('statWork').textContent = allOrders.filter(o => o.status === 'В работе').length;
+                document.getElementById('statDone').textContent = allOrders.filter(o => o.status === 'Выполнена').length;
             }
 
-            function renderOrders() {
-                const filtered = currentFilter === 'all'
-                    ? allOrders
-                    : allOrders.filter(function(o) { return o.status === currentFilter; });
+            function getFilteredOrders() {
+                const query = (searchInput.value || '').trim().toLowerCase();
+                return allOrders.filter((order) => {
+                    const matchesStatus = currentFilter === 'Все' || order.status === currentFilter;
+                    const text = [
+                        order.id,
+                        order.client_name,
+                        order.car_model,
+                        order.phone,
+                        order.email,
+                        order.service,
+                        order.status,
+                        order.notes
+                    ].join(' ').toLowerCase();
+                    return matchesStatus && (!query || text.includes(query));
+                });
+            }
 
-                if (filtered.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="13" class="empty">Нет заявок</td></tr>';
+            function field(id, name, value, type = 'text', attrs = '') {
+                return `<input ${type ? `type="${type}"` : ''} id="${name}-${id}" value="${esc(value)}" ${attrs}>`;
+            }
+
+            function statusSelect(id, value) {
+                return `<select class="status-select" id="status-${id}">
+                    ${statuses.map(s => `<option value="${esc(s)}" ${s === value ? 'selected' : ''}>${esc(s)}</option>`).join('')}
+                </select>`;
+            }
+
+            function serviceSelect(id, value) {
+                const services = ['', 'Антигравийная плёнка', 'Винилография', 'Тонировка', 'Полировка', 'Полная оклейка'];
+                return `<select id="service-${id}">
+                    ${services.map(s => `<option value="${esc(s)}" ${s === (value || '') ? 'selected' : ''}>${s ? esc(s) : 'Не выбрано'}</option>`).join('')}
+                </select>`;
+            }
+
+            function render() {
+                setStats();
+                const orders = getFilteredOrders();
+
+                if (!orders.length) {
+                    ordersBody.innerHTML = '<tr><td colspan="12" class="empty">Заявок пока нет</td></tr>';
+                    mobileCards.innerHTML = '<div class="empty">Заявок пока нет</div>';
                     return;
                 }
 
-                tbody.innerHTML = filtered.map(function(order) {
-                    return `
-                    <tr>
-                        <td>#${order.id}</td>
-                        <td>${formatDate(order.created_at)}</td>
-                        <td><input value="${esc(order.client_name)}" id="name-${order.id}"></td>
-                        <td><input value="${esc(order.car_model)}" id="car-${order.id}"></td>
-                        <td><input value="${esc(order.phone || '')}" id="phone-${order.id}"></td>
-                        <td><input value="${esc(order.email || '')}" id="email-${order.id}"></td>
-                        <td><input value="${esc(order.service || '')}" id="service-${order.id}"></td>
-                        <td><input type="date" value="${order.appointment_date || ''}" id="date-${order.id}"></td>
-                        <td><input type="time" value="${order.appointment_time || ''}" id="time-${order.id}"></td>
-                        <td>
-                            <select id="status-${order.id}">
-                                <option ${order.status === 'Новая' ? 'selected' : ''}>Новая</option>
-                                <option ${order.status === 'В работе' ? 'selected' : ''}>В работе</option>
-                                <option ${order.status === 'Выполнена' ? 'selected' : ''}>Выполнена</option>
-                                <option ${order.status === 'Отменена' ? 'selected' : ''}>Отменена</option>
-                            </select>
-                        </td>
-                        <td><input value="${esc(order.price || '')}" id="price-${order.id}" style="width:100px;"></td>
-                        <td><input value="${esc(order.notes || '')}" id="notes-${order.id}"></td>
-                        <td>
-                            <button class="btn btn-save" data-id="${order.id}">Сохранить</button>
-                            <button class="btn btn-delete" data-id="${order.id}">Удалить</button>
-                        </td>
+                ordersBody.innerHTML = orders.map((order) => {
+                    const id = order.id;
+                    return `<tr>
+                        <td><span class="id-pill">#${esc(id)}</span></td>
+                        <td>${field(id, 'name', order.client_name)}</td>
+                        <td>${field(id, 'car', order.car_model)}</td>
+                        <td>${field(id, 'phone', order.phone)}</td>
+                        <td>${field(id, 'email', order.email, 'email')}</td>
+                        <td>${serviceSelect(id, order.service)}</td>
+                        <td>${field(id, 'date', order.appointment_date, 'date', `min="${getTodayISO()}"`)}</td>
+                        <td>${field(id, 'time', order.appointment_time, 'time', 'min="10:00" max="21:00" step="600"')}</td>
+                        <td>${statusSelect(id, order.status)}</td>
+                        <td>${field(id, 'price', order.price, 'text', 'inputmode="numeric" style="min-width:95px"')}</td>
+                        <td><textarea id="notes-${id}">${esc(order.notes)}</textarea></td>
+                        <td><div class="row-actions"><button class="small-btn save" data-save="${esc(id)}">Сохранить</button><button class="small-btn delete" data-delete="${esc(id)}">Удалить</button></div></td>
                     </tr>`;
                 }).join('');
 
-                tbody.querySelectorAll('.btn-save').forEach(function(btn) {
-                    btn.addEventListener('click', function() { saveOrder(this.dataset.id); });
-                });
+                mobileCards.innerHTML = orders.map((order) => {
+                    const id = order.id;
+                    return `<div class="order-card">
+                        <div class="order-card-head"><span class="id-pill">#${esc(id)}</span>${statusSelect(id + '-m', order.status)}</div>
+                        <div class="order-card-grid">
+                            ${field(id + '-m', 'name', order.client_name)}
+                            ${field(id + '-m', 'car', order.car_model)}
+                            ${field(id + '-m', 'phone', order.phone)}
+                            ${field(id + '-m', 'email', order.email, 'email')}
+                            ${serviceSelect(id + '-m', order.service)}
+                            ${field(id + '-m', 'date', order.appointment_date, 'date', `min="${getTodayISO()}"`)}
+                            ${field(id + '-m', 'time', order.appointment_time, 'time', 'min="10:00" max="21:00" step="600"')}
+                            ${field(id + '-m', 'price', order.price, 'text', 'inputmode="numeric"')}
+                            <textarea id="notes-${id}-m">${esc(order.notes)}</textarea>
+                            <div class="row-actions"><button class="small-btn save" data-save-mobile="${esc(id)}">Сохранить</button><button class="small-btn delete" data-delete="${esc(id)}">Удалить</button></div>
+                        </div>
+                    </div>`;
+                }).join('');
 
-                tbody.querySelectorAll('.btn-delete').forEach(function(btn) {
-                    btn.addEventListener('click', function() { deleteOrder(this.dataset.id); });
-                });
+                attachRowActions();
             }
 
-            function esc(text) {
-                if (text === null || text === undefined) return '';
-                return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            function readOrderFromDom(id, mobile = false) {
+                const suffix = mobile ? `${id}-m` : id;
+                return {
+                    client_name: document.getElementById(`name-${suffix}`).value.trim(),
+                    car_model: document.getElementById(`car-${suffix}`).value.trim(),
+                    phone: document.getElementById(`phone-${suffix}`).value.trim(),
+                    email: document.getElementById(`email-${suffix}`).value.trim(),
+                    service: document.getElementById(`service-${suffix}`).value,
+                    appointment_date: document.getElementById(`date-${suffix}`).value || null,
+                    appointment_time: document.getElementById(`time-${suffix}`).value || null,
+                    status: document.getElementById(`status-${suffix}`).value,
+                    price: document.getElementById(`price-${suffix}`).value.trim(),
+                    notes: document.getElementById(`notes-${suffix}`).value.trim()
+                };
             }
 
-            function formatDate(value) {
-                if (!value) return '';
-                const date = new Date(value);
-                if (Number.isNaN(date.getTime())) return '';
-                return date.toLocaleString('ru-RU');
+            function validateOrder(payload) {
+                const digits = (payload.phone || '').replace(/\D/g, '');
+                if (payload.phone && digits.length !== 11) return 'Телефон должен содержать 11 цифр';
+                if (payload.email && !/^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(payload.email)) return 'Введите корректный email';
+                if (payload.appointment_date && payload.appointment_date < getTodayISO()) return 'Нельзя выбрать прошедшую дату';
+                if (payload.appointment_time && (payload.appointment_time < '10:00' || payload.appointment_time > '21:00')) return 'Время должно быть с 10:00 до 21:00';
+                if (payload.price && !/^\d+$/.test(payload.price)) return 'Цена должна содержать только цифры';
+                return null;
             }
 
-            async function saveOrder(id) {
-                const phone = document.getElementById('phone-' + id).value;
-                const email = document.getElementById('email-' + id).value;
-                const price = document.getElementById('price-' + id).value;
-                const phoneDigits = phone.replace(/\D/g, '');
-
-                if (phoneDigits.length !== 11 && phoneDigits.length !== 0) {
-                    alert('Телефон должен содержать 11 цифр');
-                    return;
-                }
-
-                if (email && !/^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email)) {
-                    alert('Введите корректный email');
-                    return;
-                }
-
-                if (price && !/^\d*$/.test(price)) {
-                    alert('Цена должна содержать только цифры');
+            async function saveOrder(id, mobile = false) {
+                const payload = readOrderFromDom(id, mobile);
+                const validationError = validateOrder(payload);
+                if (validationError) {
+                    showToast(validationError, 'error');
                     return;
                 }
 
                 try {
-                    await api('/api/orders/' + encodeURIComponent(id), {
+                    await api(`/api/orders/${encodeURIComponent(id)}`, {
                         method: 'PUT',
-                        body: JSON.stringify({
-                            client_name: document.getElementById('name-' + id).value,
-                            car_model: document.getElementById('car-' + id).value,
-                            phone,
-                            email,
-                            service: document.getElementById('service-' + id).value,
-                            appointment_date: document.getElementById('date-' + id).value || null,
-                            appointment_time: document.getElementById('time-' + id).value || null,
-                            status: document.getElementById('status-' + id).value,
-                            price,
-                            notes: document.getElementById('notes-' + id).value
-                        })
+                        body: JSON.stringify(payload)
                     });
-
-                    alert('Сохранено!');
-                    loadOrders();
+                    showToast('Заявка сохранена', 'success');
+                    await loadOrders();
                 } catch (error) {
-                    alert('Ошибка: ' + error.message);
+                    showToast(error.message, 'error');
                 }
             }
 
             async function deleteOrder(id) {
-                if (!confirm('Удалить заявку #' + id + '?')) return;
+                if (!confirm(`Удалить заявку #${id}?`)) return;
 
                 try {
-                    await api('/api/orders/' + encodeURIComponent(id), { method: 'DELETE' });
-                    loadOrders();
+                    await api(`/api/orders/${encodeURIComponent(id)}`, { method: 'DELETE' });
+                    showToast('Заявка удалена', 'success');
+                    await loadOrders();
                 } catch (error) {
-                    alert('Ошибка: ' + error.message);
+                    showToast(error.message, 'error');
                 }
             }
+
+            function attachRowActions() {
+                document.querySelectorAll('[data-save]').forEach((btn) => btn.addEventListener('click', () => saveOrder(btn.dataset.save, false)));
+                document.querySelectorAll('[data-save-mobile]').forEach((btn) => btn.addEventListener('click', () => saveOrder(btn.dataset.saveMobile, true)));
+                document.querySelectorAll('[data-delete]').forEach((btn) => btn.addEventListener('click', () => deleteOrder(btn.dataset.delete)));
+            }
+
+            async function loadOrders() {
+                ordersBody.innerHTML = '<tr><td colspan="12" class="loading">Загружаем заявки...</td></tr>';
+                mobileCards.innerHTML = '<div class="loading">Загружаем заявки...</div>';
+
+                try {
+                    const result = await api('/api/orders');
+                    allOrders = result.orders || [];
+                    render();
+                } catch (error) {
+                    ordersBody.innerHTML = `<tr><td colspan="12" class="empty">${esc(error.message)}</td></tr>`;
+                    mobileCards.innerHTML = `<div class="empty">${esc(error.message)}</div>`;
+                    showToast(error.message, 'error');
+                }
+            }
+
+            document.querySelectorAll('.filter-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    currentFilter = btn.dataset.filter;
+                    document.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    render();
+                });
+            });
+
+            searchInput.addEventListener('input', render);
+            document.getElementById('refreshBtn').addEventListener('click', loadOrders);
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                try { await api('/api/admin/logout', { method: 'POST' }); } catch (e) {}
+                window.location.href = '/admin-login';
+            });
 
             loadOrders();
         })();
