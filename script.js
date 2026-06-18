@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             generateBtn.disabled = true;
             generateBtn.innerHTML = 'ГЕНЕРИРУЮ...';
-            if (aiResponseDiv) aiResponseDiv.innerHTML = 'Qwen AI обрабатывает...';
+            if (aiResponseDiv) aiResponseDiv.innerHTML = 'BLACKRED AI обрабатывает...';
             if (aiImageContainer) aiImageContainer.style.display = 'none';
 
             try {
