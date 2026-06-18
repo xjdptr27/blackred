@@ -65,8 +65,17 @@ document.addEventListener('DOMContentLoaded', function() {
             timeInput.type = 'time';
             timeInput.setAttribute('min', '10:00');
             timeInput.setAttribute('max', '21:00');
-            timeInput.setAttribute('step', '600');
+            timeInput.setAttribute('step', '900');
             if (!timeInput.value) timeInput.value = '10:00';
+
+            const openTimePicker = function() {
+                if (typeof timeInput.showPicker === 'function') {
+                    try { timeInput.showPicker(); } catch (error) {}
+                }
+            };
+
+            timeInput.addEventListener('click', openTimePicker);
+            timeInput.addEventListener('focus', openTimePicker);
 
             timeInput.addEventListener('change', function() {
                 if (timeInput.value && timeInput.value < '10:00') {
@@ -305,6 +314,78 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         syncPortfolioLayout();
+    }
+
+    // ========================
+    // СЛАЙДЕР ПРОЦЕССА РАБОТЫ
+    // ========================
+    const studioGrid = document.getElementById('studioGrid');
+    const studioPrev = document.getElementById('studioPrev');
+    const studioNext = document.getElementById('studioNext');
+    const studioDotsContainer = document.getElementById('studioDots');
+
+    if (studioGrid && studioPrev && studioNext) {
+        let currentStudioPage = 0;
+        let studioItemsPerPage = 4;
+        let studioTotalPages = 1;
+        let studioResizeTimer = null;
+        const studioItems = Array.from(studioGrid.querySelectorAll('.studio-item'));
+
+        function getStudioItemsPerPage() {
+            if (window.innerWidth <= 768) return 1;
+            if (window.innerWidth <= 1024) return 2;
+            return 4;
+        }
+
+        function renderStudioDots() {
+            if (!studioDotsContainer) return;
+
+            studioDotsContainer.innerHTML = '';
+            for (let i = 0; i < studioTotalPages; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('studio-dot');
+                if (i === currentStudioPage) dot.classList.add('active');
+                dot.addEventListener('click', () => goToStudioPage(i));
+                studioDotsContainer.appendChild(dot);
+            }
+        }
+
+        function updateStudioDots() {
+            const dots = studioDotsContainer?.querySelectorAll('.studio-dot');
+            dots?.forEach((d, i) => d.classList.toggle('active', i === currentStudioPage));
+        }
+
+        function updateStudioButtons() {
+            if (studioPrev) studioPrev.disabled = currentStudioPage === 0;
+            if (studioNext) studioNext.disabled = currentStudioPage >= studioTotalPages - 1;
+        }
+
+        function goToStudioPage(page) {
+            currentStudioPage = Math.max(0, Math.min(page, studioTotalPages - 1));
+            const targetItem = studioItems[currentStudioPage * studioItemsPerPage];
+            const offset = targetItem ? targetItem.offsetLeft : 0;
+            studioGrid.style.transform = 'translateX(-' + offset + 'px)';
+            updateStudioDots();
+            updateStudioButtons();
+        }
+
+        function syncStudioLayout() {
+            studioItemsPerPage = getStudioItemsPerPage();
+            studioTotalPages = Math.max(1, Math.ceil(studioItems.length / studioItemsPerPage));
+            currentStudioPage = Math.min(currentStudioPage, studioTotalPages - 1);
+            renderStudioDots();
+            goToStudioPage(currentStudioPage);
+        }
+
+        studioPrev.addEventListener('click', () => goToStudioPage(currentStudioPage - 1));
+        studioNext.addEventListener('click', () => goToStudioPage(currentStudioPage + 1));
+
+        window.addEventListener('resize', () => {
+            clearTimeout(studioResizeTimer);
+            studioResizeTimer = setTimeout(syncStudioLayout, 120);
+        });
+
+        syncStudioLayout();
     }
 
     // ========================

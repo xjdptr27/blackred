@@ -441,7 +441,7 @@
                         <td>${field(id, 'email', order.email, 'email')}</td>
                         <td>${serviceSelect(id, order.service)}</td>
                         <td>${field(id, 'date', order.appointment_date, 'date', `min="${getTodayISO()}"`)}</td>
-                        <td>${field(id, 'time', order.appointment_time, 'time', 'min="10:00" max="21:00" step="600"')}</td>
+                        <td>${field(id, 'time', order.appointment_time, 'time', 'min="10:00" max="21:00" step="900"')}</td>
                         <td>${statusSelect(id, order.status)}</td>
                         <td>${field(id, 'price', order.price, 'text', 'inputmode="numeric" style="min-width:95px"')}</td>
                         <td><textarea id="notes-${id}">${esc(order.notes)}</textarea></td>
@@ -460,7 +460,7 @@
                             ${field(id + '-m', 'email', order.email, 'email')}
                             ${serviceSelect(id + '-m', order.service)}
                             ${field(id + '-m', 'date', order.appointment_date, 'date', `min="${getTodayISO()}"`)}
-                            ${field(id + '-m', 'time', order.appointment_time, 'time', 'min="10:00" max="21:00" step="600"')}
+                            ${field(id + '-m', 'time', order.appointment_time, 'time', 'min="10:00" max="21:00" step="900"')}
                             ${field(id + '-m', 'price', order.price, 'text', 'inputmode="numeric"')}
                             <textarea id="notes-${id}-m">${esc(order.notes)}</textarea>
                             <div class="row-actions"><button class="small-btn save" data-save-mobile="${esc(id)}">Сохранить</button><button class="small-btn delete" data-delete="${esc(id)}">Удалить</button></div>
@@ -557,6 +557,20 @@
                     btn.classList.add('active');
                     render();
                 });
+            });
+
+            document.addEventListener('click', function(event) {
+                const input = event.target.closest('input[type="date"], input[type="time"]');
+                if (input && typeof input.showPicker === 'function') {
+                    try { input.showPicker(); } catch (error) {}
+                }
+            });
+
+            document.addEventListener('focusin', function(event) {
+                const input = event.target.closest('input[type="date"], input[type="time"]');
+                if (input && typeof input.showPicker === 'function') {
+                    try { input.showPicker(); } catch (error) {}
+                }
             });
 
             searchInput.addEventListener('input', render);
